@@ -1,158 +1,346 @@
-:root {
-    /* Sky Blue Theme - Geometric & Neumorphic */
-    --bg-color: #CAF0F8;
-    --primary: #00B4D8;       
-    --primary-dark: #0077B6;  
-    --white: #CAF0F8; 
-    --text-dark: #2c3e50;
-    --text-light: #5f7d8b;
-    --danger: #e63946;
-    --success: #2a9d8f;
+// === البيانات (Mock Data) ===
+
+let globalNews = "أهلاً بكم في العام الدراسي الجديد. يرجى مراجعة الجدول.";
+
+let studentsDB = [
+    {
+        id: 1, code: "STU-101", name: "أحمد محمد علي", grade: "5أ",
+        attendance_days: 45, late_assignments: 1, performance: "ممتاز",
+        profile_pic: "https://via.placeholder.com/150",
+        notifications: ["درجة الرياضيات متاحة الآن."],
+        marks: [
+            { subject: "الرياضيات", score: 95, grade: "ممتاز", note: "أداء رائع" },
+            { subject: "اللغة العربية", score: 88, grade: "جيد جداً", note: "" }
+        ],
+        messages: [ // سجل الرسائل
+            { from: "student", to: "ali@school.com", text: "يا أستاذ، متى موعد الاختبار؟" },
+            { from: "teacher", to: "ali@school.com", text: "يوم الأحد القادم يا أحمد." }
+        ]
+    },
+    {
+        id: 2, code: "STU-102", name: "سارة خالد", grade: "5أ",
+        attendance_days: 42, late_assignments: 0, performance: "جيد جداً",
+        profile_pic: "https://via.placeholder.com/150",
+        notifications: [],
+        marks: [ { subject: "الرياضيات", score: 78, grade: "جيد", note: "" } ],
+        messages: []
+    }
+];
+
+let teachersDB = [
+    { 
+        id: 1, name: "أ. علي حسن", email: "ali@school.com", pass: "123", phone: "0770000000",
+        specialty: "رياضيات", subjects: "رياضيات", classes: "5أ", 
+        absence: 2, pic: "https://via.placeholder.com/40",
+        schedule: [
+            { day: "الأحد", p1: "5أ (رياضيات)", p2: "راحة", p3: "5ب (رياضيات)", p4: "--" },
+            { day: "الاثنين", p1: "راحة", p2: "5أ (رياضيات)", p3: "--", p4: "5ب (رياضيات)" }
+        ],
+        assignments: ["حل تمارين ص 45", "نشاط هندسي"]
+    }
+];
+
+// === إدارة تسجيل الدخول ===
+
+function switchLogin(type) {
+    document.querySelectorAll('.login-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('studentLoginForm').style.display = 'none';
+    document.getElementById('teacherLoginForm').style.display = 'none';
+    document.getElementById('adminLoginForm').style.display = 'none';
+
+    if (type === 'student') {
+        document.querySelector("button[onclick=\"switchLogin('student')\"]").classList.add('active');
+        document.getElementById('studentLoginForm').style.display = 'block';
+    } else if (type === 'teacher') {
+        document.querySelector("button[onclick=\"switchLogin('teacher')\"]").classList.add('active');
+        document.getElementById('teacherLoginForm').style.display = 'block';
+    } else {
+        document.querySelector("button[onclick=\"switchLogin('admin')\"]").classList.add('active');
+        document.getElementById('adminLoginForm').style.display = 'block';
+    }
+}
+
+// === دخول الطالب ===
+let currentStudent = null;
+function studentLogin() {
+    const code = document.getElementById('studentCodeInput').value;
+    currentStudent = studentsDB.find(s => s.code === code);
+    if (currentStudent) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('studentDashboard').style.display = 'flex';
+        loadStudentData(currentStudent);
+    } else alert("الرمز غير صحيح!");
+}
+
+// === دخول الإدارة ===
+function adminLogin() {
+    const user = document.getElementById('adminUser').value;
+    const pass = document.getElementById('adminPass').value;
+    if (user === 'admin' && pass === '123') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'flex';
+        loadAdminData();
+    } else alert("بيانات خاطئة!");
+}
+
+// === دخول المعلم ===
+let currentTeacher = null;
+function teacherLogin() {
+    const email = document.getElementById('teacherEmail').value;
+    const pass = document.getElementById('teacherPass').value;
+    const teacher = teachersDB.find(t => t.email === email && t.pass === pass);
     
-    /* 3D Shadows */
-    --shadow-light: #f0fcff;
-    --shadow-dark: #a6c5ce;
-    --inner-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
-    --outer-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-    --radius: 16px;
+    if (teacher) {
+        currentTeacher = teacher;
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('teacherDashboard').style.display = 'flex';
+        document.getElementById('teacherNameDisplay').innerText = `أهلاً بك، ${teacher.name}`;
+        loadTeacherDashboard();
+    } else alert("بيانات المعلم غير صحيحة");
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    outline: none;
+function logout() { location.reload(); }
+
+// === منطق الطالب ===
+function loadStudentData(student) {
+    document.getElementById('studentNameDisplay').innerText = `أهلاً بك، ${student.name}`;
+    document.getElementById('stu-att-days').innerText = student.attendance_days;
+    document.getElementById('newsMarquee').innerText = globalNews;
+    
+    // شحن قائمة الدردشة بالمعلمين
+    let chatOptions = "<option value=''>اختر معلماً لمراسلته...</option>";
+    teachersDB.forEach(t => {
+        chatOptions += `<option value="${t.email}">${t.name} (${t.specialty})</option>`;
+    });
+    document.getElementById('chatTeacherSelect').innerHTML = chatOptions;
+
+    // الدرجات
+    let marksHTML = "";
+    student.marks.forEach(m => {
+        marksHTML += `<tr><td>${m.subject}</td><td>${m.score}</td><td>${m.grade}</td><td>${m.note}</td></tr>`;
+    });
+    document.getElementById('studentMarksTable').innerHTML = marksHTML;
+    
+    // الجدول (ثابت مؤقتاً للطالب)
+    document.getElementById('studentScheduleTable').innerHTML = `
+        <tr><td>الأحد</td><td>رياضيات</td><td>عربي</td><td>علوم</td></tr>
+        <tr><td>الاثنين</td><td>علوم</td><td>رياضيات</td><td>رياضة</td></tr>
+    `;
 }
 
-body {
-    background-color: var(--bg-color);
-    color: var(--text-dark);
-    height: 100vh;
-    overflow-x: hidden;
+// دردشة الطالب
+function loadStudentChat() {
+    const teacherEmail = document.getElementById('chatTeacherSelect').value;
+    const box = document.getElementById('studentChatBox');
+    box.innerHTML = "";
+    if(!teacherEmail) return;
+
+    // تصفية الرسائل الخاصة بهذا المعلم
+    const chats = currentStudent.messages.filter(m => m.to === teacherEmail || m.from === "teacher"); // تبسيط: عرض كل رسائل المعلمين للتجربة
+    chats.forEach(msg => {
+        const type = msg.from === 'student' ? 'sent' : 'received';
+        box.innerHTML += `<div class="message ${type}">${msg.text}</div>`;
+    });
 }
 
-/* 3D Components */
-.card-3d {
-    background: var(--bg-color);
-    border-radius: var(--radius);
-    box-shadow: var(--outer-shadow);
-    border: 1px solid rgba(255,255,255,0.2);
+function sendStudentMessage() {
+    const txt = document.getElementById('studentMsgInput').value;
+    const teacherEmail = document.getElementById('chatTeacherSelect').value;
+    if(txt && teacherEmail) {
+        currentStudent.messages.push({ from: "student", to: teacherEmail, text: txt });
+        document.getElementById('studentMsgInput').value = "";
+        loadStudentChat();
+    }
 }
 
-.card-3d-inset {
-    background: var(--bg-color);
-    border-radius: var(--radius);
-    box-shadow: var(--inner-shadow);
+// === منطق المعلم (المطور) ===
+function loadTeacherDashboard() {
+    showTeacherSection('tea-students');
+    
+    // 1. جدول الطلاب للرصد
+    let stuHtml = "";
+    studentsDB.filter(s => s.grade === currentTeacher.classes).forEach(s => {
+        const mark = s.marks.find(m => m.subject === currentTeacher.specialty)?.score || "--";
+        stuHtml += `
+            <tr>
+                <td>${s.name}</td>
+                <td>
+                    <button class="btn-3d" onclick="toggleAttendance(${s.id})" style="padding:5px; font-size:12px">
+                        <i class="fas fa-check-circle" style="color:${s.attendance_days > 40 ? 'green':'grey'}"></i>
+                    </button>
+                </td>
+                <td>${mark}</td>
+                <td>
+                    <button class="btn-3d btn-primary" onclick="gradeStudent('${s.code}', '${currentTeacher.specialty}')"><i class="fas fa-edit"></i></button>
+                </td>
+            </tr>
+        `;
+    });
+    document.getElementById('teacherStudentsTable').innerHTML = stuHtml;
+
+    // 2. جدول الحصص
+    let schHtml = "";
+    currentTeacher.schedule.forEach(row => {
+        schHtml += `<tr><td>${row.day}</td><td>${row.p1}</td><td>${row.p2}</td><td>${row.p3}</td><td>${row.p4}</td></tr>`;
+    });
+    document.getElementById('teacherScheduleTable').innerHTML = schHtml;
+
+    // 3. الواجبات
+    updateAssignmentsList();
+
+    // 4. إعداد الرسائل
+    let msgOptions = "<option value=''>اختر طالباً...</option>";
+    studentsDB.filter(s => s.grade === currentTeacher.classes).forEach(s => {
+        // التحقق مما إذا كان هناك رسائل
+        const hasMsg = s.messages.some(m => m.to === currentTeacher.email);
+        msgOptions += `<option value="${s.code}">${s.name} ${hasMsg ? '🔴' : ''}</option>`;
+    });
+    document.getElementById('msgStudentSelect').innerHTML = msgOptions;
+    
+    // 5. الملف الشخصي
+    document.getElementById('myEmail').value = currentTeacher.email;
+    document.getElementById('myPhone').value = currentTeacher.phone || "";
+    document.getElementById('myPic').value = currentTeacher.pic;
 }
 
-.input-3d {
-    background: var(--bg-color);
-    border: none;
-    padding: 12px 15px;
-    border-radius: 10px;
-    box-shadow: var(--inner-shadow);
-    color: var(--text-dark);
-    transition: 0.3s;
-    width: 100%;
+// وظائف المعلم الفرعية
+function toggleAttendance(stuId) {
+    const s = studentsDB.find(x => x.id === stuId);
+    s.attendance_days++; 
+    alert(`تم تسجيل حضور ${s.name}`);
+    loadTeacherDashboard();
 }
 
-.input-3d:focus {
-    box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
-    color: var(--primary-dark);
+function addAssignment() {
+    const title = document.getElementById('newAssignTitle').value;
+    if(title) {
+        currentTeacher.assignments.push(title);
+        updateAssignmentsList();
+        document.getElementById('newAssignTitle').value = "";
+    }
 }
 
-.btn-3d {
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    background: var(--bg-color);
-    box-shadow: var(--outer-shadow);
-    color: var(--primary-dark);
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+function updateAssignmentsList() {
+    let html = "";
+    currentTeacher.assignments.forEach(a => html += `<li>${a} <small>(تم النشر)</small></li>`);
+    document.getElementById('teacherAssignmentsList').innerHTML = html;
 }
 
-.btn-3d:active {
-    box-shadow: var(--inner-shadow);
-    transform: translateY(2px);
+function saveTeacherProfile() {
+    const newPass = document.getElementById('myNewPass').value;
+    const newPhone = document.getElementById('myPhone').value;
+    const newPic = document.getElementById('myPic').value;
+    
+    if(newPass) currentTeacher.pass = newPass;
+    if(newPhone) currentTeacher.phone = newPhone;
+    if(newPic) currentTeacher.pic = newPic;
+    
+    alert("تم حفظ البيانات بنجاح!");
 }
 
-.btn-primary { color: var(--primary-dark); }
-.btn-primary:hover { color: var(--primary); }
-.btn-success { color: var(--success); }
-.btn-secondary { color: var(--text-light); }
-
-/* Layouts */
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+// دردشة المعلم
+let chattingStudentCode = null;
+function loadTeacherChat() {
+    chattingStudentCode = document.getElementById('msgStudentSelect').value;
+    const box = document.getElementById('teacherChatBox');
+    box.innerHTML = "";
+    if(!chattingStudentCode) return;
+    
+    const student = studentsDB.find(s => s.code === chattingStudentCode);
+    const chats = student.messages.filter(m => m.to === currentTeacher.email || (m.from === "teacher" && m.to === currentTeacher.email)); // تبسيط للمحاكاة
+    
+    // في الواقع نحتاج معرفة لمن أرسل المعلم، هنا سنعرض كل رسائل الطالب للمعلم
+    student.messages.forEach(msg => {
+        // إذا الرسالة من الطالب (sent بالنسبة للطالب) فهي (received بالنسبة للمعلم)
+        // إذا الرسالة من المعلم (received بالنسبة للطالب) فهي (sent بالنسبة للمعلم)
+        // لكن في الـ DB نحن نخزن from/to. 
+        if(msg.to === currentTeacher.email && msg.from === 'student') {
+             box.innerHTML += `<div class="message received">${msg.text}</div>`;
+        } else if (msg.from === 'teacher') { // افتراض اننا نكلم نفس الطالب
+             box.innerHTML += `<div class="message sent">${msg.text}</div>`;
+        }
+    });
 }
-.login-box { padding: 2.5rem; width: 380px; text-align: center; }
-.login-tabs { display: flex; margin-bottom: 25px; padding: 5px; }
-.login-tabs button { flex: 1; border: none; background: transparent; padding: 10px; cursor: pointer; border-radius: 10px; color: var(--text-light); }
-.login-tabs button.active { background: var(--bg-color); box-shadow: var(--outer-shadow); color: var(--primary); }
 
-.input-group { display: flex; align-items: center; margin-bottom: 20px; padding: 0 5px; }
-.input-group i { margin-left: 10px; color: var(--primary); width: 20px;}
-
-.dashboard-container { display: flex; height: 100vh; }
-.sidebar { width: 260px; padding: 25px; margin: 15px; display: flex; flex-direction: column; }
-.sidebar .logo { font-size: 22px; font-weight: bold; color: var(--primary-dark); margin-bottom: 30px; text-align: center; text-shadow: 1px 1px 2px var(--shadow-dark); }
-.sidebar nav a { display: block; padding: 12px 15px; color: var(--text-light); text-decoration: none; margin-bottom: 12px; border-radius: 10px; transition: 0.3s; }
-.sidebar nav a:hover, .sidebar nav a.active { box-shadow: var(--inner-shadow); color: var(--primary-dark); }
-
-.main-content { flex: 1; padding: 20px 30px; overflow-y: auto; }
-header { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-
-/* Dashboard Widgets */
-.cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 25px; }
-.big-num { font-size: 2.8rem; color: var(--primary-dark); font-weight: bold; margin-top: 15px; text-shadow: 1px 1px 2px var(--shadow-dark); }
-
-/* Tables */
-.styled-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
-.styled-table thead tr { background: transparent; }
-.styled-table th { padding: 15px; color: var(--text-light); font-weight: bold; }
-.styled-table tbody tr { background: var(--bg-color); box-shadow: var(--outer-shadow); border-radius: 10px; }
-.styled-table td { padding: 15px; text-align: right; }
-.styled-table td:first-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
-.styled-table td:last-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
-
-/* Chat UI */
-.chat-container { display: flex; flex-direction: column; height: 500px; padding: 20px; }
-.chat-header { margin-bottom: 15px; padding: 10px; }
-.chat-box { flex: 1; overflow-y: auto; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
-.chat-input-area { display: flex; gap: 10px; }
-
-.message { padding: 10px 15px; border-radius: 10px; max-width: 70%; font-size: 14px; }
-.message.sent { align-self: flex-end; background: var(--primary); color: white; box-shadow: var(--outer-shadow); }
-.message.received { align-self: flex-start; background: var(--bg-color); color: var(--text-dark); box-shadow: var(--outer-shadow); }
-
-/* Misc */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); backdrop-filter: blur(5px); z-index: 1000; display: flex; justify-content: center; align-items: center; }
-.modal-content { width: 500px; padding: 30px; }
-.form-grid { display: grid; gap: 15px; margin-top: 20px; }
-.notif-btn { border-radius: 50%; width: 45px; height: 45px; position: relative; }
-.notif-btn .badge { position: absolute; top: 0; right: 0; background: var(--danger); color: white; font-size: 10px; padding: 3px 6px; border-radius: 50%; }
-.profile-pic-small img { width: 45px; height: 45px; border-radius: 50%; box-shadow: var(--outer-shadow); border: 2px solid var(--bg-color); }
-.progress-container { width: 100%; height: 12px; margin-top: 15px; overflow: hidden; }
-.progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--success)); }
-.notice-board ul { list-style: none; padding: 10px; }
-
-/* Display Toggles */
-.content-section, .admin-section, .teacher-section { display: none; }
-.content-section.active, .admin-section.active, .teacher-section.active { display: block; animation: fadeIn 0.4s ease-out; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-@media (max-width: 768px) {
-    .dashboard-container { flex-direction: column; }
-    .sidebar { width: auto; margin: 10px; flex-direction: row; overflow-x: auto; }
+function sendTeacherReply() {
+    const txt = document.getElementById('teacherMsgInput').value;
+    if(txt && chattingStudentCode) {
+        const student = studentsDB.find(s => s.code === chattingStudentCode);
+        student.messages.push({ from: "teacher", to: currentTeacher.email, text: txt }); // to email just to mark conversation context
+        document.getElementById('teacherMsgInput').value = "";
+        loadTeacherChat();
+    }
 }
+
+// === منطق الإدارة ===
+
+function loadAdminData() {
+    loadTeachers();
+    let htmlStu = "";
+    studentsDB.forEach(s => {
+        htmlStu += `<tr><td>${s.name}</td><td>${s.code}</td><td>${s.grade}</td></tr>`;
+    });
+    document.getElementById('adminStudentsTable').innerHTML = htmlStu;
+    document.getElementById('totalTeachers').innerText = teachersDB.length;
+}
+
+function updateNews() {
+    const txt = document.getElementById('newNewsInput').value;
+    if(txt) {
+        globalNews = txt;
+        alert("تم تحديث شريط الأخبار");
+    }
+}
+
+function loadTeachers() {
+    let html = "";
+    teachersDB.forEach(t => {
+        html += `<tr><td>${t.name}</td><td>${t.specialty}</td><td>${t.subjects}</td>
+        <td><button onclick="deleteTeacher(${t.id})" style="color:red;border:none;background:none"><i class="fas fa-trash"></i></button></td></tr>`;
+    });
+    document.getElementById('adminTeachersTable').innerHTML = html;
+}
+
+// إضافة معلم (CRUD)
+function openAddTeacherModal() { document.getElementById('teacherModal').style.display = 'flex'; }
+function closeTeacherModal() { document.getElementById('teacherModal').style.display = 'none'; }
+function saveTeacher() {
+    const data = {
+        id: Date.now(),
+        name: document.getElementById('tName').value,
+        specialty: document.getElementById('tSpecialty').value,
+        subjects: document.getElementById('tSubjects').value,
+        classes: document.getElementById('tClasses').value,
+        email: document.getElementById('tEmail').value,
+        pass: document.getElementById('tPass').value,
+        absence: 0, pic: "https://via.placeholder.com/40", schedule: [], assignments: []
+    };
+    teachersDB.push(data);
+    closeTeacherModal();
+    loadTeachers();
+}
+function deleteTeacher(id) {
+    if(confirm("حذف المعلم؟")) {
+        teachersDB = teachersDB.filter(t => t.id !== id);
+        loadTeachers();
+    }
+}
+
+// === التنقل ===
+function showSection(id) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+function showAdminSection(id) {
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+function showTeacherSection(id) {
+    document.querySelectorAll('.teacher-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+function changeTheme(p, d) {
+    document.documentElement.style.setProperty('--primary', p);
+    document.documentElement.style.setProperty('--primary-dark', d);
+}
+function downloadPDF(type) { alert(`تصدير ${type}...`); }
