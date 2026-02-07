@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الإدارة المدرسية الذكي</title>
+    <title>نظام المدرسة الذكي - النسخة الكاملة</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -12,7 +12,7 @@
     <div class="login-container" id="loginSection">
         <div class="login-box card-3d">
             <h2>بوابة المدرسة الإلكترونية</h2>
-            <p>اختر نوع الدخول</p>
+            <p>مرحباً بك، يرجى تسجيل الدخول</p>
             
             <div class="login-tabs card-3d-inset">
                 <button class="active" onclick="switchLogin('student')">طالب</button>
@@ -23,7 +23,7 @@
             <div id="studentLoginForm">
                 <div class="input-group input-3d">
                     <i class="fas fa-id-card"></i>
-                    <input type="text" id="studentCodeInput" placeholder="أدخل الرمز الخاص (مثال: STU-101)">
+                    <input type="text" id="studentCodeInput" placeholder="أدخل الرمز (مثال: STU-101)">
                 </div>
                 <button class="btn-3d btn-primary" onclick="studentLogin()">دخول الطالب</button>
             </div>
@@ -62,7 +62,7 @@
             </div>
             
             <div class="theme-selector">
-                <p>اختر لون الواجهة:</p>
+                <p>لون الواجهة:</p>
                 <div class="colors">
                     <span class="color-btn blue active" onclick="changeTheme('#00B4D8', '#0077B6')"></span>
                     <span class="color-btn purple" onclick="changeTheme('#9b59b6', '#8e44ad')"></span>
@@ -130,7 +130,7 @@
             <div id="stu-marks" class="content-section">
                 <div class="section-header">
                     <h2>كشف الدرجات</h2>
-                    <button class="btn-3d btn-secondary" onclick="downloadPDF('الدرجات')"><i class="fas fa-file-pdf"></i> تحميل PDF</button>
+                    <button class="btn-3d btn-secondary" onclick="downloadPDF('الدرجات')"><i class="fas fa-file-pdf"></i> PDF</button>
                 </div>
                 <table class="styled-table card-3d">
                     <thead>
@@ -163,7 +163,8 @@
                             </select>
                     </div>
                     <div class="chat-box card-3d-inset" id="studentChatBox">
-                        </div>
+                        <p style="text-align:center; color:#777; margin-top:20px;">اختر معلماً لبدء المحادثة</p>
+                    </div>
                     <div class="chat-input-area">
                         <input type="text" id="studentMsgInput" class="input-3d" placeholder="اكتب رسالتك...">
                         <button class="btn-3d btn-primary" onclick="sendStudentMessage()"><i class="fas fa-paper-plane"></i></button>
@@ -199,9 +200,9 @@
                 </div>
                 
                 <div class="card-3d" style="margin-top: 20px; padding: 20px;">
-                    <h4><i class="fas fa-bullhorn"></i> شريط الأخبار</h4>
+                    <h4><i class="fas fa-bullhorn"></i> تحديث شريط الأخبار</h4>
                     <div style="display:flex; gap:10px; margin-top:10px;">
-                        <input type="text" id="newNewsInput" class="input-3d" style="flex:1" placeholder="اكتب خبراً جديداً...">
+                        <input type="text" id="newNewsInput" class="input-3d" style="flex:1" placeholder="اكتب الخبر العاجل هنا...">
                         <button class="btn-3d btn-primary" onclick="updateNews()">نشر</button>
                     </div>
                 </div>
@@ -211,7 +212,7 @@
                 <h2>إدارة الصفوف الدراسية</h2>
                 <div class="card-3d" style="padding: 50px; text-align: center; color: var(--text-light);">
                     <i class="fas fa-layer-group" style="font-size: 50px; margin-bottom: 20px;"></i>
-                    <p>هذا القسم مخصص لإدارة الصفوف والشعب (قيد التطوير المستقبلي)</p>
+                    <p>هذا القسم مخصص لإدارة الصفوف والشعب (سيتم تفعيله قريباً)</p>
                 </div>
             </div>
 
