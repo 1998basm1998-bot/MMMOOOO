@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الإدارة المدرسية الذكي</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="login-container" id="loginSection">
+        <div class="login-box">
+            <h2>بوابة المدرسة الإلكترونية</h2>
+            <p>اختر نوع الدخول</p>
+            
+            <div class="login-tabs">
+                <button class="active" onclick="switchLogin('student')">طالب</button>
+                <button onclick="switchLogin('admin')">إدارة / معلم</button>
+            </div>
+
+            <div id="studentLoginForm">
+                <div class="input-group">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="studentCodeInput" placeholder="أدخل الرمز الخاص (مثال: STU-101)">
+                </div>
+                <button class="btn-primary" onclick="studentLogin()">دخول الطالب</button>
+                <p class="hint">جرب الرمز: STU-101</p>
+            </div>
+
+            <div id="adminLoginForm" style="display: none;">
+                <div class="input-group">
+                    <i class="fas fa-user-shield"></i>
+                    <input type="text" id="adminUser" placeholder="اسم المستخدم">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="adminPass" placeholder="كلمة المرور">
+                </div>
+                <button class="btn-primary" onclick="adminLogin()">دخول الإدارة</button>
+                <p class="hint">المستخدم: admin | كلمة المرور: 123</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container" id="studentDashboard" style="display: none;">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>بوابة الطالب</span>
+            </div>
+            <nav>
+                <a href="#" class="active" onclick="showSection('stu-home')"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="#" onclick="showSection('stu-info')"><i class="fas fa-user"></i> معلوماتي</a>
+                <a href="#" onclick="showSection('stu-marks')"><i class="fas fa-chart-bar"></i> الدرجات</a>
+                <a href="#" onclick="showSection('stu-schedule')"><i class="fas fa-calendar-alt"></i> الجدول</a>
+                <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h3 id="studentNameDisplay">مرحباً بك</h3>
+            </header>
+
+            <div id="stu-home" class="content-section active">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>أيام الحضور</h3>
+                        <p class="big-num" id="stu-att-days">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>الواجبات</h3>
+                        <p class="big-num">3</p>
+                    </div>
+                </div>
+                <div class="notice-board">
+                    <h4><i class="fas fa-bullhorn"></i> إشعارات المدرسة</h4>
+                    <ul>
+                        <li>موعد اختبار الرياضيات يوم الأحد القادم.</li>
+                        <li>يرجى تسديد رسوم الكتب المدرسية.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="stu-info" class="content-section">
+                <h2>المعلومات الشخصية</h2>
+                <div class="profile-card" id="studentProfileData">
+                    </div>
+            </div>
+
+            <div id="stu-marks" class="content-section">
+                <h2>كشف الدرجات</h2>
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>المادة</th>
+                            <th>الدرجة</th>
+                            <th>التقدير</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentMarksTable">
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="stu-schedule" class="content-section">
+                <h2>الجدول الأسبوعي</h2>
+                <div class="schedule-placeholder">
+                    <p>الجدول الدراسي للصف الخامس - أ</p>
+                    </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="dashboard-container" id="adminDashboard" style="display: none;">
+        <aside class="sidebar admin-sidebar">
+            <div class="logo">
+                <i class="fas fa-school"></i>
+                <span>لوحة الإدارة</span>
+            </div>
+            <nav>
+                <a href="#" class="active" onclick="showAdminSection('adm-home')"><i class="fas fa-tachometer-alt"></i> الرئيسية</a>
+                <a href="#" onclick="showAdminSection('adm-students')"><i class="fas fa-users"></i> الطلاب</a>
+                <a href="#" onclick="showAdminSection('adm-teachers')"><i class="fas fa-chalkboard-teacher"></i> المعلمون</a>
+                <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h3>لوحة تحكم المدير</h3>
+            </header>
+
+            <div id="adm-home" class="admin-section active">
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>عدد الطلاب</h3>
+                        <p class="big-num">1,250</p>
+                    </div>
+                    <div class="card">
+                        <h3>عدد المعلمين</h3>
+                        <p class="big-num">45</p>
+                    </div>
+                    <div class="card">
+                        <h3>الحضور اليوم</h3>
+                        <p class="big-num">98%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="adm-students" class="admin-section">
+                <h2>إدارة الطلاب</h2>
+                <div class="action-bar">
+                    <button class="btn-primary">إضافة طالب جديد</button>
+                    <input type="text" placeholder="بحث بالاسم أو الكود...">
+                </div>
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>الكود</th>
+                            <th>الصف</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminStudentsTable">
+                        </tbody>
+                </table>
+            </div>
+            
+            <div id="adm-teachers" class="admin-section">
+                <h2>قائمة المعلمين</h2>
+                <p>محتوى إدارة المعلمين...</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
