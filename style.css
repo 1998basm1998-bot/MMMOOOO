@@ -153,7 +153,105 @@ header { margin-bottom: 25px; display: flex; justify-content: space-between; ali
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+/* ========================================= */
+/* === التعديل المطلوب: توافق شاشات الهاتف === */
+/* ========================================= */
 @media (max-width: 768px) {
-    .dashboard-container { flex-direction: column; }
-    .sidebar { width: auto; margin: 10px; flex-direction: row; overflow-x: auto; }
+    /* 1. الحاوية الرئيسية */
+    .dashboard-container {
+        flex-direction: column;
+        display: block; /* تغيير العرض للسماح بالتمرير */
+        padding-bottom: 80px; /* مسافة للشريط السفلي */
+    }
+
+    /* 2. تحويل القائمة الجانبية إلى شريط سفلي */
+    .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 70px;
+        margin: 0;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+        border-radius: 20px 20px 0 0;
+        padding: 5px 15px;
+        background: var(--bg-color);
+        box-shadow: 0 -4px 10px rgba(166, 197, 206, 0.5); /* ظل خفيف للأعلى */
+        overflow-x: auto; /* السماح بالتمرير الجانبي إذا كثرت الأيقونات */
+    }
+
+    /* إخفاء العناصر غير الضرورية في الشريط السفلي */
+    .sidebar .logo, 
+    .sidebar .theme-selector {
+        display: none;
+    }
+
+    .sidebar nav {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        gap: 5px;
+    }
+
+    /* تنسيق أزرار التنقل السفلية */
+    .sidebar nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+        margin: 0;
+        font-size: 10px; /* تصغير الخط */
+        flex: 1;
+        text-align: center;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .sidebar nav a i {
+        font-size: 18px;
+        margin-bottom: 3px;
+        margin-left: 0;
+    }
+    
+    .sidebar nav a.active {
+        box-shadow: var(--inner-shadow);
+        background: var(--bg-color);
+        border-radius: 10px;
+    }
+
+    /* 3. تعديلات المحتوى الرئيسي */
+    .main-content {
+        padding: 15px 15px 90px 15px; /* هامش سفلي كبير لكي لا يغطي الشريط المحتوى */
+        overflow-y: visible; /* السماح بتمرير الصفحة بالكامل */
+    }
+
+    /* 4. جعل الجداول قابلة للتمرير أفقياً */
+    .styled-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    /* 5. تعديلات النوافذ المنبثقة (Modal) */
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    /* 6. تسجيل الدخول */
+    .login-box {
+        width: 100%;
+        padding: 20px;
+    }
+    
+    /* 7. العناوين والأرقام */
+    .big-num { font-size: 2rem; }
+    h2, h3 { font-size: 1.3rem; }
 }
