@@ -49,11 +49,24 @@
                 <i class="fas fa-graduation-cap"></i>
                 <span>بوابة الطالب</span>
             </div>
+            
+            <div class="theme-selector">
+                <p>اختر لون الواجهة:</p>
+                <div class="colors">
+                    <span class="color-btn blue active" onclick="changeTheme('#00B4D8', '#0077B6')"></span>
+                    <span class="color-btn purple" onclick="changeTheme('#9b59b6', '#8e44ad')"></span>
+                    <span class="color-btn green" onclick="changeTheme('#2ecc71', '#27ae60')"></span>
+                    <span class="color-btn orange" onclick="changeTheme('#e67e22', '#d35400')"></span>
+                </div>
+            </div>
+
             <nav>
                 <a href="#" class="active" onclick="showSection('stu-home')"><i class="fas fa-home"></i> الرئيسية</a>
                 <a href="#" onclick="showSection('stu-info')"><i class="fas fa-user"></i> معلوماتي</a>
                 <a href="#" onclick="showSection('stu-marks')"><i class="fas fa-chart-bar"></i> الدرجات</a>
                 <a href="#" onclick="showSection('stu-schedule')"><i class="fas fa-calendar-alt"></i> الجدول</a>
+                <a href="#" onclick="showSection('stu-activities')"><i class="fas fa-futbol"></i> الأنشطة</a>
+                <a href="#" onclick="showSection('stu-contact')"><i class="fas fa-envelope"></i> تواصل معنا</a>
                 <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</a>
             </nav>
         </aside>
@@ -61,6 +74,13 @@
         <main class="main-content">
             <header>
                 <h3 id="studentNameDisplay">مرحباً بك</h3>
+                <div class="header-actions">
+                    <button class="notif-btn"><i class="fas fa-bell"></i> <span class="badge">3</span></button>
+                    <div class="profile-pic-small" onclick="document.getElementById('profileUpload').click()">
+                        <img src="https://via.placeholder.com/40" id="headerProfileImg" alt="Profile">
+                        <input type="file" id="profileUpload" hidden onchange="uploadImage(this)">
+                    </div>
+                </div>
             </header>
 
             <div id="stu-home" class="content-section active">
@@ -68,18 +88,29 @@
                     <div class="card">
                         <h3>أيام الحضور</h3>
                         <p class="big-num" id="stu-att-days">0</p>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="attendanceBar" style="width: 0%"></div>
+                        </div>
                     </div>
                     <div class="card">
-                        <h3>الواجبات</h3>
-                        <p class="big-num">3</p>
+                        <h3>الواجبات المتأخرة</h3>
+                        <p class="big-num warning-text" id="stu-late-assign">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>التقييم العام</h3>
+                        <p class="big-num" id="stu-performance">--</p>
                     </div>
                 </div>
+                
+                <div class="news-ticker">
+                    <span><i class="fas fa-bullhorn"></i> أخبار المدرسة:</span>
+                    <marquee>بدء التسجيل للرحلة المدرسية يوم الخميس - يرجى مراجعة الإدارة لاستلام الكتب الجديدة - تهنئة للفريق الرياضي للفوز بالبطولة</marquee>
+                </div>
+
                 <div class="notice-board">
-                    <h4><i class="fas fa-bullhorn"></i> إشعارات المدرسة</h4>
-                    <ul>
-                        <li>موعد اختبار الرياضيات يوم الأحد القادم.</li>
-                        <li>يرجى تسديد رسوم الكتب المدرسية.</li>
-                    </ul>
+                    <h4><i class="fas fa-clock"></i> آخر التحديثات</h4>
+                    <ul id="notificationsList">
+                        </ul>
                 </div>
             </div>
 
@@ -90,13 +121,17 @@
             </div>
 
             <div id="stu-marks" class="content-section">
-                <h2>كشف الدرجات</h2>
+                <div class="section-header">
+                    <h2>كشف الدرجات والملاحظات</h2>
+                    <button class="btn-secondary" onclick="downloadPDF('الدرجات')"><i class="fas fa-file-pdf"></i> تحميل النتائج PDF</button>
+                </div>
                 <table class="styled-table">
                     <thead>
                         <tr>
                             <th>المادة</th>
                             <th>الدرجة</th>
                             <th>التقدير</th>
+                            <th>ملاحظات المعلم</th>
                         </tr>
                     </thead>
                     <tbody id="studentMarksTable">
@@ -105,10 +140,50 @@
             </div>
 
             <div id="stu-schedule" class="content-section">
-                <h2>الجدول الأسبوعي</h2>
+                <div class="section-header">
+                    <h2>الجدول الأسبوعي</h2>
+                    <button class="btn-secondary" onclick="downloadPDF('الجدول')"><i class="fas fa-file-pdf"></i> تحميل الجدول PDF</button>
+                </div>
                 <div class="schedule-placeholder">
-                    <p>الجدول الدراسي للصف الخامس - أ</p>
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>اليوم</th>
+                                <th>الحصة 1</th>
+                                <th>الحصة 2</th>
+                                <th>الحصة 3</th>
+                                <th>الحصة 4</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentScheduleTable">
+                            <tr><td>الأحد</td><td>رياضيات</td><td>عربي</td><td>علوم</td><td>إنجليزي</td></tr>
+                            <tr><td>الاثنين</td><td>علوم</td><td>رياضيات</td><td>رياضة</td><td>عربي</td></tr>
+                            <tr><td>الثلاثاء</td><td>إنجليزي</td><td>فنية</td><td>رياضيات</td><td>إسلامية</td></tr>
+                            <tr><td>الأربعاء</td><td>عربي</td><td>علوم</td><td>اجتماعيات</td><td>حاسوب</td></tr>
+                            <tr><td>الخميس</td><td>نشاط</td><td>إنجليزي</td><td>رياضيات</td><td>علوم</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="stu-activities" class="content-section">
+                <h2>الأنشطة والفعاليات</h2>
+                <div class="activities-list" id="activitiesList">
                     </div>
+            </div>
+
+            <div id="stu-contact" class="content-section">
+                <h2>تواصل مع الإدارة والمعلمين</h2>
+                <div class="contact-form">
+                    <select class="input-style">
+                        <option>الإدارة</option>
+                        <option>معلم الرياضيات</option>
+                        <option>معلم العلوم</option>
+                        <option>المرشد الطلابي</option>
+                    </select>
+                    <textarea class="input-style" rows="4" placeholder="اكتب رسالتك أو استفسارك هنا..."></textarea>
+                    <button class="btn-primary" onclick="alert('تم إرسال رسالتك بنجاح!')">إرسال الرسالة</button>
+                </div>
             </div>
         </main>
     </div>
@@ -122,7 +197,7 @@
             <nav>
                 <a href="#" class="active" onclick="showAdminSection('adm-home')"><i class="fas fa-tachometer-alt"></i> الرئيسية</a>
                 <a href="#" onclick="showAdminSection('adm-students')"><i class="fas fa-users"></i> الطلاب</a>
-                <a href="#" onclick="showAdminSection('adm-teachers')"><i class="fas fa-chalkboard-teacher"></i> المعلمون</a>
+                <a href="#" onclick="showAdminSection('adm-reports')"><i class="fas fa-chart-line"></i> التقارير</a>
                 <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</a>
             </nav>
         </aside>
@@ -130,6 +205,7 @@
         <main class="main-content">
             <header>
                 <h3>لوحة تحكم المدير</h3>
+                <button class="btn-success" onclick="alert('تم إنشاء نسخة احتياطية بنجاح')"><i class="fas fa-database"></i> نسخ احتياطي فوري</button>
             </header>
 
             <div id="adm-home" class="admin-section active">
@@ -139,12 +215,12 @@
                         <p class="big-num">1,250</p>
                     </div>
                     <div class="card">
-                        <h3>عدد المعلمين</h3>
-                        <p class="big-num">45</p>
-                    </div>
-                    <div class="card">
                         <h3>الحضور اليوم</h3>
                         <p class="big-num">98%</p>
+                    </div>
+                    <div class="card">
+                        <h3>متوسط الأداء</h3>
+                        <p class="big-num">85%</p>
                     </div>
                 </div>
             </div>
@@ -169,9 +245,18 @@
                 </table>
             </div>
             
-            <div id="adm-teachers" class="admin-section">
-                <h2>قائمة المعلمين</h2>
-                <p>محتوى إدارة المعلمين...</p>
+            <div id="adm-reports" class="admin-section">
+                <h2>التقارير والإحصائيات</h2>
+                <div class="report-actions">
+                    <button class="btn-secondary" onclick="downloadPDF('تقرير الحضور')"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    <button class="btn-secondary" onclick="downloadPDF('التقرير العام')"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+                </div>
+                <p>إحصائيات تفصيلية عن أداء المدرسة...</p>
+                <div class="chart-mockup">
+                    <div style="height: 20px; width: 80%; background: var(--primary); margin: 10px 0;"></div>
+                    <div style="height: 20px; width: 60%; background: var(--success); margin: 10px 0;"></div>
+                    <div style="height: 20px; width: 90%; background: var(--danger); margin: 10px 0;"></div>
+                </div>
             </div>
         </main>
     </div>
