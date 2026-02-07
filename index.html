@@ -26,20 +26,18 @@
                     <input type="text" id="studentCodeInput" placeholder="أدخل الرمز الخاص (مثال: STU-101)">
                 </div>
                 <button class="btn-3d btn-primary" onclick="studentLogin()">دخول الطالب</button>
-                <p class="hint">جرب الرمز: STU-101</p>
             </div>
 
             <div id="teacherLoginForm" style="display: none;">
                 <div class="input-group input-3d">
                     <i class="fas fa-chalkboard-teacher"></i>
-                    <input type="text" id="teacherEmail" placeholder="البريد الإلكتروني للمعلم">
+                    <input type="text" id="teacherEmail" placeholder="البريد الإلكتروني">
                 </div>
                  <div class="input-group input-3d">
                     <i class="fas fa-key"></i>
                     <input type="password" id="teacherPass" placeholder="كلمة المرور">
                 </div>
                 <button class="btn-3d btn-primary" onclick="teacherLogin()">دخول المعلم</button>
-                <p class="hint">مثال: ali@school.com | 123</p>
             </div>
 
             <div id="adminLoginForm" style="display: none;">
@@ -52,7 +50,6 @@
                     <input type="password" id="adminPass" placeholder="كلمة المرور">
                 </div>
                 <button class="btn-3d btn-primary" onclick="adminLogin()">دخول الإدارة</button>
-                <p class="hint">المستخدم: admin | كلمة المرور: 123</p>
             </div>
         </div>
     </div>
@@ -79,8 +76,7 @@
                 <a href="#" onclick="showSection('stu-info')"><i class="fas fa-user"></i> معلوماتي</a>
                 <a href="#" onclick="showSection('stu-marks')"><i class="fas fa-chart-bar"></i> الدرجات</a>
                 <a href="#" onclick="showSection('stu-schedule')"><i class="fas fa-calendar-alt"></i> الجدول</a>
-                <a href="#" onclick="showSection('stu-activities')"><i class="fas fa-futbol"></i> الأنشطة</a>
-                <a href="#" onclick="showSection('stu-contact')"><i class="fas fa-envelope"></i> تواصل معنا</a>
+                <a href="#" onclick="showSection('stu-chat')"><i class="fas fa-comments"></i> الرسائل</a>
                 <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</a>
             </nav>
         </aside>
@@ -90,9 +86,8 @@
                 <h3 id="studentNameDisplay">مرحباً بك</h3>
                 <div class="header-actions">
                     <button class="notif-btn btn-3d"><i class="fas fa-bell"></i> <span class="badge">3</span></button>
-                    <div class="profile-pic-small" onclick="document.getElementById('profileUpload').click()">
+                    <div class="profile-pic-small">
                         <img src="https://via.placeholder.com/40" id="headerProfileImg" alt="Profile">
-                        <input type="file" id="profileUpload" hidden onchange="uploadImage(this)">
                     </div>
                 </div>
             </header>
@@ -107,18 +102,18 @@
                         </div>
                     </div>
                     <div class="card-3d">
-                        <h3>الواجبات المتأخرة</h3>
+                        <h3>الواجبات</h3>
                         <p class="big-num warning-text" id="stu-late-assign">0</p>
                     </div>
                     <div class="card-3d">
-                        <h3>التقييم العام</h3>
+                        <h3>التقييم</h3>
                         <p class="big-num" id="stu-performance">--</p>
                     </div>
                 </div>
                 
                 <div class="news-ticker card-3d-inset">
                     <span><i class="fas fa-bullhorn"></i> أخبار المدرسة:</span>
-                    <marquee>بدء التسجيل للرحلة المدرسية يوم الخميس - يرجى مراجعة الإدارة لاستلام الكتب الجديدة.</marquee>
+                    <marquee id="newsMarquee">أهلاً بكم في العام الدراسي الجديد.</marquee>
                 </div>
 
                 <div class="notice-board card-3d">
@@ -134,7 +129,7 @@
 
             <div id="stu-marks" class="content-section">
                 <div class="section-header">
-                    <h2>كشف الدرجات والملاحظات</h2>
+                    <h2>كشف الدرجات</h2>
                     <button class="btn-3d btn-secondary" onclick="downloadPDF('الدرجات')"><i class="fas fa-file-pdf"></i> تحميل PDF</button>
                 </div>
                 <table class="styled-table card-3d">
@@ -151,36 +146,28 @@
             </div>
 
             <div id="stu-schedule" class="content-section">
-                <div class="section-header">
-                    <h2>الجدول الأسبوعي</h2>
-                    <button class="btn-3d btn-secondary" onclick="downloadPDF('الجدول')"><i class="fas fa-file-pdf"></i> تحميل PDF</button>
-                </div>
+                <h2>الجدول الأسبوعي</h2>
                 <div class="schedule-placeholder card-3d">
                     <table class="styled-table">
-                         <thead>
-                            <tr>
-                                <th>اليوم</th><th>الحصة 1</th><th>الحصة 2</th><th>الحصة 3</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>الأحد</td><td>رياضيات</td><td>عربي</td><td>علوم</td></tr>
-                            <tr><td>الاثنين</td><td>علوم</td><td>رياضيات</td><td>رياضة</td></tr>
-                        </tbody>
+                         <thead><tr><th>اليوم</th><th>الحصة 1</th><th>الحصة 2</th><th>الحصة 3</th></tr></thead>
+                        <tbody id="studentScheduleTable"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="stu-activities" class="content-section">
-                <h2>الأنشطة والفعاليات</h2>
-                <div class="activities-list" id="activitiesList"></div>
-            </div>
-
-            <div id="stu-contact" class="content-section">
-                <h2>تواصل مع الإدارة</h2>
-                <div class="contact-form card-3d" style="padding:20px;">
-                    <select class="input-3d input-style"><option>الإدارة</option><option>المرشد</option></select>
-                    <textarea class="input-3d input-style" rows="4" placeholder="اكتب رسالتك..."></textarea>
-                    <button class="btn-3d btn-primary" onclick="alert('تم الإرسال')">إرسال</button>
+            <div id="stu-chat" class="content-section">
+                <h2>تواصل مع المعلمين</h2>
+                <div class="chat-container card-3d">
+                    <div class="chat-header card-3d-inset">
+                        <select id="chatTeacherSelect" class="input-3d" onchange="loadStudentChat()">
+                            </select>
+                    </div>
+                    <div class="chat-box card-3d-inset" id="studentChatBox">
+                        </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="studentMsgInput" class="input-3d" placeholder="اكتب رسالتك...">
+                        <button class="btn-3d btn-primary" onclick="sendStudentMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -194,9 +181,8 @@
             </div>
             <nav>
                 <a href="#" class="active" onclick="showAdminSection('adm-home')"><i class="fas fa-tachometer-alt"></i> الرئيسية</a>
-                <a href="#" onclick="showAdminSection('adm-teachers')"><i class="fas fa-chalkboard-teacher"></i> المعلمون</a>
+                <a href="#" onclick="showAdminSection('adm-classes')"><i class="fas fa-layer-group"></i> الصفوف</a> <a href="#" onclick="showAdminSection('adm-teachers')"><i class="fas fa-chalkboard-teacher"></i> المعلمون</a>
                 <a href="#" onclick="showAdminSection('adm-students')"><i class="fas fa-users"></i> الطلاب</a>
-                <a href="#" onclick="showAdminSection('adm-reports')"><i class="fas fa-chart-line"></i> التقارير</a>
                 <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</a>
             </nav>
         </aside>
@@ -204,55 +190,56 @@
         <main class="main-content">
             <header>
                 <h3>لوحة تحكم المدير</h3>
-                <button class="btn-3d btn-success" onclick="alert('تم النسخ الاحتياطي')"><i class="fas fa-database"></i> نسخ احتياطي</button>
             </header>
 
             <div id="adm-home" class="admin-section active">
                 <div class="cards-grid">
-                    <div class="card-3d"><h3>عدد الطلاب</h3><p class="big-num">1,250</p></div>
-                    <div class="card-3d"><h3>عدد المعلمين</h3><p class="big-num" id="totalTeachers">0</p></div>
-                    <div class="card-3d"><h3>الحضور</h3><p class="big-num">98%</p></div>
+                    <div class="card-3d"><h3>الطلاب</h3><p class="big-num">1,250</p></div>
+                    <div class="card-3d"><h3>المعلمين</h3><p class="big-num" id="totalTeachers">0</p></div>
+                </div>
+                
+                <div class="card-3d" style="margin-top: 20px; padding: 20px;">
+                    <h4><i class="fas fa-bullhorn"></i> شريط الأخبار</h4>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <input type="text" id="newNewsInput" class="input-3d" style="flex:1" placeholder="اكتب خبراً جديداً...">
+                        <button class="btn-3d btn-primary" onclick="updateNews()">نشر</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="adm-classes" class="admin-section">
+                <h2>إدارة الصفوف الدراسية</h2>
+                <div class="card-3d" style="padding: 50px; text-align: center; color: var(--text-light);">
+                    <i class="fas fa-layer-group" style="font-size: 50px; margin-bottom: 20px;"></i>
+                    <p>هذا القسم مخصص لإدارة الصفوف والشعب (قيد التطوير المستقبلي)</p>
                 </div>
             </div>
 
             <div id="adm-teachers" class="admin-section">
                 <h2>إدارة المعلمين</h2>
-                <div class="card-3d" style="padding: 20px; margin-bottom: 20px;">
+                <div class="card-3d" style="padding: 20px;">
                     <div class="action-bar" style="display:flex; gap:10px; margin-bottom:15px;">
-                        <input type="text" id="searchTeacherInput" onkeyup="searchTeacher()" class="input-3d" placeholder="بحث باسم المعلم أو المادة..." style="flex:1; padding:10px;">
-                        <button class="btn-3d btn-primary" onclick="openAddTeacherModal()"><i class="fas fa-plus"></i> إضافة معلم</button>
-                        <button class="btn-3d btn-secondary" onclick="downloadPDF('بيانات المعلمين')"><i class="fas fa-file-excel"></i> تصدير</button>
+                        <button class="btn-3d btn-primary" onclick="openAddTeacherModal()">إضافة معلم</button>
                     </div>
-                    
                     <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>الصورة</th>
-                                <th>الاسم</th>
-                                <th>التخصص</th>
-                                <th>المواد</th>
-                                <th>الغياب</th>
-                                <th>إجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminTeachersTable">
-                            </tbody>
+                        <thead><tr><th>الاسم</th><th>التخصص</th><th>المواد</th><th>إجراءات</th></tr></thead>
+                        <tbody id="adminTeachersTable"></tbody>
                     </table>
                 </div>
 
                 <div id="teacherModal" class="modal-overlay" style="display:none;">
                     <div class="modal-content card-3d">
-                        <h3 id="modalTitle">إضافة معلم جديد</h3>
+                        <h3>بيانات المعلم</h3>
                         <div class="form-grid">
-                            <input type="text" id="tName" class="input-3d" placeholder="الاسم الرباعي">
-                            <input type="text" id="tSpecialty" class="input-3d" placeholder="التخصص (مثال: رياضيات)">
-                            <input type="text" id="tSubjects" class="input-3d" placeholder="المواد (افصل بفاصلة)">
-                            <input type="text" id="tClasses" class="input-3d" placeholder="الصفوف (مثال: 5أ, 6ب)">
-                            <input type="email" id="tEmail" class="input-3d" placeholder="البريد الإلكتروني">
-                            <input type="number" id="tAbsence" class="input-3d" placeholder="أيام الغياب" value="0">
+                            <input type="text" id="tName" class="input-3d" placeholder="الاسم">
+                            <input type="text" id="tSpecialty" class="input-3d" placeholder="التخصص">
+                            <input type="text" id="tSubjects" class="input-3d" placeholder="المواد">
+                            <input type="text" id="tClasses" class="input-3d" placeholder="الصفوف">
+                            <input type="email" id="tEmail" class="input-3d" placeholder="الايميل">
+                            <input type="password" id="tPass" class="input-3d" placeholder="كلمة المرور">
                         </div>
-                        <div class="modal-actions" style="margin-top:20px; text-align:left;">
-                            <button class="btn-3d btn-success" onclick="saveTeacher()">حفظ البيانات</button>
+                        <div class="modal-actions" style="margin-top:20px;">
+                            <button class="btn-3d btn-success" onclick="saveTeacher()">حفظ</button>
                             <button class="btn-3d btn-secondary" onclick="closeTeacherModal()">إلغاء</button>
                         </div>
                     </div>
@@ -263,15 +250,10 @@
                 <h2>إدارة الطلاب</h2>
                 <div class="card-3d" style="padding:20px;">
                     <table class="styled-table">
-                        <thead><tr><th>الاسم</th><th>الكود</th><th>الصف</th><th>إجراءات</th></tr></thead>
+                        <thead><tr><th>الاسم</th><th>الكود</th><th>الصف</th></tr></thead>
                         <tbody id="adminStudentsTable"></tbody>
                     </table>
                 </div>
-            </div>
-            
-            <div id="adm-reports" class="admin-section">
-                <h2>التقارير</h2>
-                <p>إحصائيات الأداء والحضور...</p>
             </div>
         </main>
     </div>
@@ -280,8 +262,11 @@
         <aside class="sidebar card-3d">
             <div class="logo"><i class="fas fa-chalkboard-teacher"></i> <span>المعلم</span></div>
             <nav>
-                <a href="#" class="active"><i class="fas fa-users"></i> طلابي</a>
-                <a href="#"><i class="fas fa-calendar-alt"></i> جدولي</a>
+                <a href="#" class="active" onclick="showTeacherSection('tea-students')"><i class="fas fa-users"></i> طلابي ورصد الدرجات</a>
+                <a href="#" onclick="showTeacherSection('tea-schedule')"><i class="fas fa-calendar-alt"></i> جدولي</a>
+                <a href="#" onclick="showTeacherSection('tea-assignments')"><i class="fas fa-book"></i> الواجبات</a>
+                <a href="#" onclick="showTeacherSection('tea-messages')"><i class="fas fa-envelope"></i> الرسائل</a>
+                <a href="#" onclick="showTeacherSection('tea-profile')"><i class="fas fa-user-cog"></i> الملف الشخصي</a>
                 <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> خروج</a>
             </nav>
         </aside>
@@ -289,14 +274,70 @@
             <header>
                 <h3 id="teacherNameDisplay">مرحباً أستاذ</h3>
             </header>
-            <div class="card-3d" style="padding:20px;">
-                <h4>رصد الدرجات والملاحظات</h4>
-                <p style="color:#777; margin-bottom:15px;">قم باختيار الطالب لإضافة درجة المادة الخاصة بك.</p>
-                <table class="styled-table">
-                    <thead><tr><th>كود الطالب</th><th>اسم الطالب</th><th>الصف</th><th>الدرجة الحالية</th><th>إجراء</th></tr></thead>
-                    <tbody id="teacherStudentsTable"></tbody>
-                </table>
+
+            <div id="tea-students" class="teacher-section active">
+                <div class="card-3d" style="padding:20px;">
+                    <h4><i class="fas fa-edit"></i> سجل الطلاب</h4>
+                    <table class="styled-table">
+                        <thead><tr><th>الطالب</th><th>الحضور</th><th>الدرجة</th><th>إجراءات</th></tr></thead>
+                        <tbody id="teacherStudentsTable"></tbody>
+                    </table>
+                </div>
             </div>
+
+            <div id="tea-schedule" class="teacher-section">
+                <h2>جدول الحصص</h2>
+                <div class="card-3d" style="padding:20px;">
+                    <table class="styled-table">
+                        <thead><tr><th>اليوم</th><th>الحصة 1</th><th>الحصة 2</th><th>الحصة 3</th><th>الحصة 4</th></tr></thead>
+                        <tbody id="teacherScheduleTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tea-assignments" class="teacher-section">
+                <h2>إدارة الواجبات</h2>
+                <div class="card-3d" style="padding:20px;">
+                    <div style="margin-bottom:15px; display:flex; gap:10px;">
+                        <input type="text" id="newAssignTitle" class="input-3d" placeholder="عنوان الواجب" style="flex:1">
+                        <button class="btn-3d btn-primary" onclick="addAssignment()">إضافة واجب</button>
+                    </div>
+                    <ul id="teacherAssignmentsList" class="notice-board"></ul>
+                </div>
+            </div>
+
+            <div id="tea-messages" class="teacher-section">
+                <h2>رسائل الطلاب</h2>
+                <div class="chat-container card-3d">
+                    <div class="chat-header card-3d-inset">
+                        <select id="msgStudentSelect" class="input-3d" onchange="loadTeacherChat()">
+                            </select>
+                    </div>
+                    <div class="chat-box card-3d-inset" id="teacherChatBox"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="teacherMsgInput" class="input-3d" placeholder="رد على الطالب...">
+                        <button class="btn-3d btn-primary" onclick="sendTeacherReply()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tea-profile" class="teacher-section">
+                <h2>تعديل الملف الشخصي</h2>
+                <div class="card-3d" style="padding:30px; max-width:500px; margin:0 auto;">
+                    <div class="form-grid">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" id="myEmail" class="input-3d" readonly>
+                        <label>كلمة المرور الجديدة</label>
+                        <input type="password" id="myNewPass" class="input-3d" placeholder="اتركها فارغة لعدم التغيير">
+                        <label>رقم الهاتف</label>
+                        <input type="text" id="myPhone" class="input-3d" placeholder="07...">
+                        <label>الصورة الشخصية (رابط)</label>
+                        <input type="text" id="myPic" class="input-3d">
+                    </div>
+                    <button class="btn-3d btn-success" style="margin-top:20px; width:100%" onclick="saveTeacherProfile()">حفظ التغييرات</button>
+                </div>
+            </div>
+
         </main>
     </div>
 
